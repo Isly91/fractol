@@ -6,26 +6,23 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/12 11:54:14 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/15 20:29:16 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/17 16:09:55 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fractol.h"
 
-void    julia_or_mandelbrot(char *which_fractal)
+int    julia_or_mandelbrot(char *which_fractal)
 {
-	if (ft_strncmp("julia", which_fractal, 6) > 0)
-		ft_printf("Julia\n");
-	else if(ft_strncmp("Julia", which_fractal, 6) > 0)
-		ft_printf("Julia\n");
-	else if(ft_strncmp("mandelbrot", which_fractal, 11) > 0)
-		ft_printf("Mandelbrot\n");
-	else if (ft_strncmp("mandelbrot", which_fractal, 11) > 0)
-		ft_printf("Mandelbrot\n");
+	if (ft_strncmp("Julia", which_fractal, 6) == 0)
+		return (1);
+	else if(ft_strncmp("Mandelbrot", which_fractal, 10) == 0)
+		return (0);
 	else
 	{
 		ft_printf("please type Mandelbrot or Julia\n");
 		exit(EXIT_FAILURE);
+		return (0);
 	}
 }
 
@@ -34,25 +31,25 @@ int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 	return (r << 24 | g << 16 | b << 8 | a);
 }
 
-void ft_add_colors(mlx_image_t *quella_troia, int32_t r, int32_t g, int32_t b, int32_t a)
+void ft_add_colors(mlx_image_t *image, int32_t r, int32_t g, int32_t b, int32_t a)
 {
 	uint32_t i;
 	uint32_t y;
 	i = 0;
-	while (i < quella_troia->width)
+	while (i < image->width)
 	{
 		y = 0;
-		while (y < quella_troia->height)
+		while (y < image->height)
 		{
 			uint32_t color = ft_pixel(r % 0xFF, g % 0xFF, b % 0xFF, a);
-			mlx_put_pixel(quella_troia, i, y, color);
+			mlx_put_pixel(image, i, y, color);
 			y++;
 		}
 		i++;
 	}
 }
 
-void change_colors(mlx_image_t *quella_troia)
+void change_colors(mlx_image_t *image)
 {
 	color_t *colors;
 	colors = malloc(sizeof(color_t));
@@ -62,71 +59,81 @@ void change_colors(mlx_image_t *quella_troia)
 	colors->g = 0;
 	colors->b = 19;
 	colors->a = 255;
-	ft_add_colors(quella_troia, colors->r, colors->g, colors->b, colors->a);
+	ft_add_colors(image, colors->r, colors->g, colors->b, colors->a);
 }
 
 void my_scrollhook(double xdelta, double ydelta, void *param)
 {
-	mlx_image_t *quella_troia;
+	mlx_image_t *image;
 	long double zoom;
 	zoom = 1;
-	quella_troia = param;
+	image = param;
 	if (!param)
 		exit(EXIT_FAILURE);
-	if (ydelta > 0 && quella_troia->height < HEIGHT && quella_troia->width < WIDTH)
+	if (ydelta > 0 && image->height < HEIGHT && image->width < WIDTH)
 	{
-		// quella_troia->instances->x *= 2;
-		// quella_troia->instances->y *= 2;
 		zoom *= 0.9;
-		quella_troia->instances->x += quella_troia->width * 0.005 *zoom;
-		quella_troia->instances->y += quella_troia->height * 0.005 * zoom;
+		image->instances->x += image->width * 0.005 *zoom;
+		image->instances->y += image->height * 0.005 * zoom;
 	}
-	else if (ydelta < 0 && quella_troia->height > 0 && quella_troia->width > 0)
+	else if (ydelta < 0 && image->height > 0 && image->width > 0)
 	{
-		// quella_troia->instances->x /= 1.05;
-		// quella_troia->instances->y /= 1.05;
 		zoom *= 1.1;
-		quella_troia->instances->x -= quella_troia->width * 0.005 *zoom;
-		quella_troia->instances->y -= quella_troia->height * 0.005 * zoom;
-		// printf("minore di 0=%i\t", quella_troia->instances->x);
-		// printf("minore di 0=%i\t", quella_troia->instances->y);
-		//printf("ydelta = %f\t", ydelta);
-		//printf("altezza =%i\t", quella_troia->height);
-		//printf("larghezza=%i\n", quella_troia->width);
+		image->instances->x -= image->width * 0.005 *zoom;
+		image->instances->y -= image->height * 0.005 * zoom;
 	}
 	xdelta++;
 }
 
-int32_t	main(int argc, char **argv)
-{
-	mlx_t *mlx;
-	mlx_image_t *quella_troia;
-	mlx_instance_t  *quella_troia_pos;
+float g_shift = 5;
 
-	if (argc == 2)
+void hook(struct mlx_key_data key_data, void* param)
+{
+	mlx_t	*mlx;
+
+	mlx = param;
+	if (key_data.key == MLX_KEY_ESCAPE && key_data.action == MLX_RELEASE)
+		mlx_close_window(mlx);
+	if (key_data.key == MLX_KEY_1 && key_data.action == MLX_RELEASE)
 	{
-		julia_or_mandelbrot(argv[1]);
-		mlx = mlx_init(WIDTH, HEIGHT, "MLX42", true);
-		quella_troia = mlx_new_image(mlx, WIDTH, HEIGHT);
-		quella_troia_pos = malloc(sizeof(mlx_instance_t));
-		quella_troia->instances = quella_troia_pos;
-		quella_troia->width = 500;
-		quella_troia->height = 500;
-		quella_troia_pos->x = (WIDTH / 2) - (quella_troia->width / 2);
-		quella_troia_pos->y = (HEIGHT / 2) - (quella_troia->height / 2);
-		if (!mlx)
-			exit(EXIT_FAILURE);
-		mlx_image_t* img = mlx_new_image(mlx, WIDTH, HEIGHT);
-		ft_memset(img->pixels, 255, img->width * img->height * BPP);
-		ft_memset(quella_troia->pixels, 255, quella_troia->width * quella_troia->height * BPP);
-		mlx_image_to_window(mlx, img, 0, 0);
-		change_colors(quella_troia);
-		mlx_scroll_hook(mlx, &my_scrollhook, quella_troia);
-		mlx_image_to_window(mlx, quella_troia, quella_troia_pos->x, quella_troia_pos->y);
-		mlx_loop(mlx);
-		mlx_terminate(mlx);
+		//printf("ciao %f\n", g_shift);	
+		g_shift+=100;
 	}
-	else
-		return (EXIT_FAILURE);
-	return (EXIT_SUCCESS);
+	if (key_data.key == MLX_KEY_0 && key_data.action == MLX_RELEASE)
+		g_shift-=0.1;
+}
+
+int32_t main(int argc, char **argv)
+{
+    mlx_t *mlx;
+    mlx_image_t *image;
+    mlx_instance_t *image_pos;
+
+    if (argc == 2)
+    {
+        julia_or_mandelbrot(argv[1]);
+        mlx = mlx_init(WIDTH, HEIGHT, "MLX42", true);
+        image = mlx_new_image(mlx, WIDTH, HEIGHT);
+        image_pos = malloc(sizeof(mlx_instance_t));
+        image->instances = image_pos;
+        image->width = WIDTH;
+        image->height = HEIGHT;
+		image_pos->x = 0;
+		image_pos->y = 0;
+        if (!mlx)
+            exit(EXIT_FAILURE);
+        ft_memset(image->pixels, 255, image->width * image->height * BPP);
+        if (julia_or_mandelbrot(argv[1]) == 0)
+			mandelbrot(image);
+		else
+			julia(image);
+        mlx_scroll_hook(mlx, &my_scrollhook, image);
+        mlx_image_to_window(mlx, image, 0, 0);
+		mlx_key_hook(mlx, &hook, mlx);
+        mlx_loop(mlx);
+        mlx_terminate(mlx);
+    }
+    else
+        return (EXIT_FAILURE);
+    return (EXIT_SUCCESS);
 }
