@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/12 11:54:14 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/17 16:09:55 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/24 14:27:18 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,61 +31,44 @@ int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 	return (r << 24 | g << 16 | b << 8 | a);
 }
 
-void ft_add_colors(mlx_image_t *image, int32_t r, int32_t g, int32_t b, int32_t a)
+double change_imaginary_image_x(imagine_t *immagine, uint32_t x_coordinate)
 {
-	uint32_t i;
-	uint32_t y;
-	i = 0;
-	while (i < image->width)
-	{
-		y = 0;
-		while (y < image->height)
-		{
-			uint32_t color = ft_pixel(r % 0xFF, g % 0xFF, b % 0xFF, a);
-			mlx_put_pixel(image, i, y, color);
-			y++;
-		}
-		i++;
-	}
+    double interval;
+    double coordinate;
+
+    immagine->image->instances->moveX = immagine->image->instances->zoom;
+    interval = immagine->image->instances->zoom * (immagine->image->instances->z_max_x - immagine->image->instances->zx) / immagine->image->width;
+    coordinate = immagine->image->instances->zx + interval * (double)x_coordinate - immagine->image->instances->moveX;
+    return (coordinate);
 }
 
-void change_colors(mlx_image_t *image)
+double change_imaginary_image_y(imagine_t *immagine, uint32_t y_coordinate)
 {
-	color_t *colors;
-	colors = malloc(sizeof(color_t));
-	if (!colors)
-		exit(EXIT_FAILURE);
-	colors->r = 76;
-	colors->g = 0;
-	colors->b = 19;
-	colors->a = 255;
-	ft_add_colors(image, colors->r, colors->g, colors->b, colors->a);
+    double interval;
+    double coordinate;
+
+    immagine->image->instances->moveY = immagine->image->instances->moveX * 3 / 4;
+    interval = immagine->image->instances->zoom * (immagine->image->instances->zy - immagine->image->instances->z_max_y) / immagine->image->height;
+    coordinate = immagine->image->instances->zy + interval * (double)y_coordinate - immagine->image->instances->moveY;
+    return (coordinate);
 }
 
 void my_scrollhook(double xdelta, double ydelta, void *param)
 {
-	mlx_image_t *image;
-	long double zoom;
-	zoom = 1;
-	image = param;
-	if (!param)
-		exit(EXIT_FAILURE);
-	if (ydelta > 0 && image->height < HEIGHT && image->width < WIDTH)
-	{
-		zoom *= 0.9;
-		image->instances->x += image->width * 0.005 *zoom;
-		image->instances->y += image->height * 0.005 * zoom;
-	}
-	else if (ydelta < 0 && image->height > 0 && image->width > 0)
-	{
-		zoom *= 1.1;
-		image->instances->x -= image->width * 0.005 *zoom;
-		image->instances->y -= image->height * 0.005 * zoom;
-	}
-	xdelta++;
+    imagine_t *immagine = param;
+
+    (void)xdelta;
+    if (ydelta < 0)
+        immagine->image->instances->zoom *= 1.1;
+    else
+        immagine->image->instances->zoom *= 0.9;
+    if (immagine->julia_or_mandelbrot == 0)
+        mandelbrot(immagine);
+    else
+        julia(immagine);
+    mlx_image_to_window(immagine->mlx, immagine->image, 0, 0);
 }
 
-float g_shift = 5;
 
 void hook(struct mlx_key_data key_data, void* param)
 {
@@ -94,42 +77,38 @@ void hook(struct mlx_key_data key_data, void* param)
 	mlx = param;
 	if (key_data.key == MLX_KEY_ESCAPE && key_data.action == MLX_RELEASE)
 		mlx_close_window(mlx);
-	if (key_data.key == MLX_KEY_1 && key_data.action == MLX_RELEASE)
-	{
-		//printf("ciao %f\n", g_shift);	
-		g_shift+=100;
-	}
-	if (key_data.key == MLX_KEY_0 && key_data.action == MLX_RELEASE)
-		g_shift-=0.1;
 }
 
 int32_t main(int argc, char **argv)
 {
     mlx_t *mlx;
-    mlx_image_t *image;
+    imagine_t *immagine;
     mlx_instance_t *image_pos;
 
     if (argc == 2)
     {
-        julia_or_mandelbrot(argv[1]);
         mlx = mlx_init(WIDTH, HEIGHT, "MLX42", true);
-        image = mlx_new_image(mlx, WIDTH, HEIGHT);
+        immagine = malloc(sizeof(imagine_t));
+        immagine->image = mlx_new_image(mlx, WIDTH, HEIGHT);
         image_pos = malloc(sizeof(mlx_instance_t));
-        image->instances = image_pos;
-        image->width = WIDTH;
-        image->height = HEIGHT;
-		image_pos->x = 0;
-		image_pos->y = 0;
+        immagine->julia_or_mandelbrot = julia_or_mandelbrot(argv[1]);
+        immagine->image->instances = image_pos;
+        immagine->image->width = WIDTH;
+        immagine->image->height = HEIGHT;
+        immagine->image->instances->zoom = 20;
+        immagine->image->instances->z_max_y = -2;
+        immagine->image->instances->z_max_x = 2;
+        immagine->mlx = mlx;
         if (!mlx)
             exit(EXIT_FAILURE);
-        ft_memset(image->pixels, 255, image->width * image->height * BPP);
-        if (julia_or_mandelbrot(argv[1]) == 0)
-			mandelbrot(image);
-		else
-			julia(image);
-        mlx_scroll_hook(mlx, &my_scrollhook, image);
-        mlx_image_to_window(mlx, image, 0, 0);
-		mlx_key_hook(mlx, &hook, mlx);
+        ft_memset(immagine->image->pixels, 255, immagine->image->width * immagine->image->height * BPP);
+        if (immagine->julia_or_mandelbrot == 0)
+            mandelbrot(immagine);
+        else
+            julia(immagine);
+        mlx_scroll_hook(mlx, &my_scrollhook, immagine);
+        mlx_image_to_window(mlx, immagine->image, 0, 0);
+        mlx_key_hook(mlx, &hook, mlx);
         mlx_loop(mlx);
         mlx_terminate(mlx);
     }

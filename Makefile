@@ -2,7 +2,7 @@ SRC = main.c \
 	mandelbrot.c \
 	julia.c
 SRC_OBJ := obj_files
-CFLAGS = -Wall -Wextra -Werror #-g -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -Ofast#-g -fsanitize=address
 INCLUDE = -Iinclude -IMLX42/include/
 MLX42 = MLX42
 MLX42AR = $(MLX42)/build/libmlx42.a
