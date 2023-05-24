@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/12 11:54:14 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/24 15:50:34 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/24 16:12:58 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ double change_imaginary_image_x(imagine_t *immagine, uint32_t x_coordinate)
     double interval;
     double coordinate;
 
-    immagine->image->instances->moveX = immagine->image->instances->zoom;
-    interval = immagine->image->instances->zoom * (immagine->image->instances->z_max_x - immagine->image->instances->zx) / immagine->image->width;
-    coordinate = immagine->image->instances->zx + interval * (double)x_coordinate - immagine->image->instances->moveX;
+    immagine->moveX = immagine->zoom;
+    interval = immagine->zoom * (immagine->z_max_x - immagine->zx) / immagine->image->width;
+    coordinate = immagine->zx + interval * (double)x_coordinate - immagine->moveX;
     return (coordinate);
 }
 
@@ -47,9 +47,9 @@ double change_imaginary_image_y(imagine_t *immagine, uint32_t y_coordinate)
     double interval;
     double coordinate;
 
-    immagine->image->instances->moveY = immagine->image->instances->moveX * 3 / 4;
-    interval = immagine->image->instances->zoom * (immagine->image->instances->zy - immagine->image->instances->z_max_y) / immagine->image->height;
-    coordinate = immagine->image->instances->zy + interval * (double)y_coordinate - immagine->image->instances->moveY;
+    immagine->moveY = immagine->moveX * 3 / 4;
+    interval = immagine->zoom * (immagine->zy - immagine->z_max_y) / immagine->image->height;
+    coordinate = immagine->zy + interval * (double)y_coordinate - immagine->moveY;
     return (coordinate);
 }
 
@@ -59,9 +59,9 @@ void my_scrollhook(double xdelta, double ydelta, void *param)
 
     (void)xdelta;
     if (ydelta < 0)
-        immagine->image->instances->zoom *= 1.1;
+        immagine->zoom *= 1.1;
     else
-        immagine->image->instances->zoom *= 0.9;
+        immagine->zoom *= 0.9;
     if (immagine->julia_or_mandelbrot == 0)
         mandelbrot(immagine);
     else
@@ -82,32 +82,28 @@ void hook(struct mlx_key_data key_data, void* param)
 int32_t main(int argc, char **argv)
 {
     mlx_t *mlx;
-    imagine_t *immagine;
-    mlx_instance_t *image_pos;
+    imagine_t immagine;
 
     if (argc == 2)
     {
         mlx = mlx_init(WIDTH, HEIGHT, "MLX42", true);
-        immagine = malloc(sizeof(imagine_t));
-        immagine->image = mlx_new_image(mlx, WIDTH, HEIGHT);
-        image_pos = malloc(sizeof(mlx_instance_t));
-        immagine->julia_or_mandelbrot = julia_or_mandelbrot(argv[1]);
-        immagine->image->instances = image_pos;
-        immagine->image->width = WIDTH;
-        immagine->image->height = HEIGHT;
-        immagine->image->instances->zoom = 10;
-        immagine->image->instances->z_max_y = -2;
-        immagine->image->instances->z_max_x = 2;
-        immagine->mlx = mlx;
+        immagine.image = mlx_new_image(mlx, WIDTH, HEIGHT);
+        immagine.julia_or_mandelbrot = julia_or_mandelbrot(argv[1]);
+        immagine.image->width = WIDTH;
+        immagine.image->height = HEIGHT;
+        immagine.zoom = 10;
+        immagine.z_max_y = -2;
+        immagine.z_max_x = 2;
+        immagine.mlx = mlx;
         if (!mlx)
             exit(EXIT_FAILURE);
-        ft_memset(immagine->image->pixels, 255, immagine->image->width * immagine->image->height * BPP);
-        if (immagine->julia_or_mandelbrot == 0)
-            mandelbrot(immagine);
+        ft_memset(immagine.image->pixels, 255, immagine.image->width * immagine.image->height * BPP);
+        if (immagine.julia_or_mandelbrot == 0)
+            mandelbrot(&immagine);
         else
-            julia(immagine);
-        mlx_scroll_hook(mlx, &my_scrollhook, immagine);
-        mlx_image_to_window(mlx, immagine->image, 0, 0);
+            julia(&immagine);
+        mlx_scroll_hook(mlx, &my_scrollhook, &immagine);
+        mlx_image_to_window(mlx, immagine.image, 0, 0);
         mlx_key_hook(mlx, &hook, mlx);
         mlx_loop(mlx);
         mlx_terminate(mlx);

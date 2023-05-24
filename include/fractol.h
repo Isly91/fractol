@@ -8,6 +8,8 @@
 # define HEIGHT 2000
 # define BPP sizeof(int32_t)
 
+// memdetect . -Iinclude -IMLX42/include -Ilibft/headers -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit -LMLX42/build -lmlx42 -e MLX42 -a Mandelbrot -il -fo libobjc AppKit GLEngine Foundation Sky IOKit
+
 typedef struct color_s
 {    
     int32_t r;
@@ -15,17 +17,6 @@ typedef struct color_s
     int32_t b;
     int32_t a;
 } color_t;
-
-typedef struct fractal_s
-{
-    double cx;
-    double cy;
-    double zx;
-    double zy;
-    double zx_new;
-    double zy_new;
-    int iter;
-} fractal_t;
 
 typedef struct Complex_s
 {
@@ -46,6 +37,18 @@ typedef struct s_imagine
     mlx_image_t *image;
     mlx_t       *mlx;
     int         julia_or_mandelbrot;
+    int         iter;
+    double      moveX;
+    double      moveY;
+    double      zx;
+    double      zy;
+    double      cx;
+    double      cy;
+    double      x;
+    double      y;
+	double      z_max_x;
+    double      z_max_y;
+    double      zoom;
 } imagine_t;
 
 //typedef struct Complex_s

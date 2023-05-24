@@ -6,7 +6,7 @@
 /*   By: W2Wizard <main@w2wizard.dev>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/12/28 02:29:06 by W2Wizard      #+#    #+#                 */
-/*   Updated: 2023/05/24 11:42:59 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/24 16:08:36 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,17 +81,6 @@ typedef struct mlx_instance
 	int32_t	x;
 	int32_t	y;
 	int32_t	z;
-	double moveX;
-    double moveY;
-    double zx;
-    double zy;
-    double cx;
-    double cy;
-	double z_max_x;
-    double z_max_y;
-    double zoom;
-    //double x;
-    //double y;
 	bool	enabled;
 }	mlx_instance_t;
 

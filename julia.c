@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/17 14:34:21 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/24 15:33:09 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/24 16:18:20 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ void draw_julia_set(imagine_t *immagine)
     //c.x = -0.7;
     //c.y = 0.27015;
 
-    immagine->image->instances->x = 0;
-    while (immagine->image->instances->x < HEIGHT) 
+    immagine->x = 0;
+    while (immagine->x < HEIGHT) 
     {
-        immagine->image->instances->y = 0;
-        while (immagine->image->instances->y < WIDTH) 
+        immagine->y = 0;
+        while (immagine->y < WIDTH) 
         {
-            double x = change_imaginary_image_x(immagine, immagine->image->instances->x);
-            double y = change_imaginary_image_y(immagine, immagine->image->instances->y);
+            double x = change_imaginary_image_x(immagine, immagine->x);
+            double y = change_imaginary_image_y(immagine, immagine->y);
             iter = 0;
             z.x = x;
             z.y = y;
@@ -47,10 +47,10 @@ void draw_julia_set(imagine_t *immagine)
                 iter++;
             }
             uint32_t    color = 0xFFFFFF / 101 * (iter + 1);
-            mlx_put_pixel(immagine->image, immagine->image->instances->y, immagine->image->instances->x, color);
-            immagine->image->instances->y++;
+            mlx_put_pixel(immagine->image, immagine->y, immagine->x, color);
+            immagine->y++;
         }
-        immagine->image->instances->x++;
+        immagine->x++;
     }
 }
 
