@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/15 19:54:01 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/24 14:17:27 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/24 15:50:14 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void mandelbrot(imagine_t *immagine)
 {
     int iteration;
+    double xtemp;
 
     immagine->image->instances->x = 0;
     while (((uint32_t) immagine->image->instances->x) < immagine->image->width)
@@ -29,7 +30,7 @@ void mandelbrot(imagine_t *immagine)
             iteration = 0;
             while (zx * zx + zy * zy < 4 && iteration < 100)
             {
-                double xtemp = zx * zx - zy * zy + cx;
+                xtemp = zx * zx - zy * zy + cx;
                 zy = 2 * zx * zy + cy;
                 zx = xtemp;
                 iteration++;

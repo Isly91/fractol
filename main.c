@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/12 11:54:14 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/24 14:27:18 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/24 15:50:34 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ int32_t main(int argc, char **argv)
         immagine->image->instances = image_pos;
         immagine->image->width = WIDTH;
         immagine->image->height = HEIGHT;
-        immagine->image->instances->zoom = 20;
+        immagine->image->instances->zoom = 10;
         immagine->image->instances->z_max_y = -2;
         immagine->image->instances->z_max_x = 2;
         immagine->mlx = mlx;
