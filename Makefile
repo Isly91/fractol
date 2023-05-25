@@ -1,8 +1,9 @@
 SRC = main.c \
 	mandelbrot.c \
-	julia.c
+	julia.c \
+	utils.c
 SRC_OBJ := obj_files
-CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address#-Ofast
+CFLAGS = -Wall -Wextra -Werror -Ofast
 INCLUDE = -Iinclude -IMLX42/include/
 MLX42 = MLX42
 MLX42AR = $(MLX42)/build/libmlx42.a
@@ -34,7 +35,5 @@ clean:
 fclean: clean
 	@make fclean -C $(LIBFT)
 	@make clean/fast -C $(MLX42)/build -j4
-	
 re: fclean all
-
 .PHONY: all clean fclean re
