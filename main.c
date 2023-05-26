@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/12 11:54:14 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/25 19:10:35 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/26 12:33:14 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	julia_or_mandelbrot(char *which_fractal, t_imagine *img)
 	}
 	else if (ft_strncmp("Mandelbrot", which_fractal, 10) == 0)
 	{
-				img->z_max_x = 2;
+		img->z_max_x = 2;
 		img->z_max_y = 2;
 		img->zoom = 10;
 		return (0);
@@ -62,9 +62,20 @@ void	my_scrollhook(double xdelta, double ydelta, void *param)
 	img = param;
 	(void)xdelta;
 	if (ydelta < 0)
+	{
+		mlx_get_mouse_pos(img->mlx, &img->mouseX, &img->mouseY);
+		printf("%d\t%d\n", img->mouseX, img->mouseY);
+		img->z_max_x =  img->z_max_x * img->mouseX / (img->mlx->width / 2) ;
+		img->z_max_y = img->z_max_y * img->mouseY / (img->mlx->height / 2) ;
 		img->zoom *= 1.1;
+	}
 	else
+	{
+		mlx_get_mouse_pos(img->mlx, &img->mouseX, &img->mouseY);
+		img->z_max_x =  img->z_max_x * img->mouseX / (img->mlx->width / 2) ;
+		img->z_max_y = img->z_max_y * img->mouseY / (img->mlx->height / 2) ;
 		img->zoom *= 0.9;
+	}
 	if (img->julia_or_mandelbrot == 0)
 		draw_mandelbrot(img);
 	else
@@ -100,7 +111,7 @@ void my_mouse_hook(mouse_key_t button, action_t action, modifier_key_t mods, voi
 		draw_mandelbrot(img);
 	else
 		julia(img);
-	mlx_image_to_window(img->mlx, img->image, 0, 0);
+	//mlx_image_to_window(img->mlx, img->image, 0, 0);
 }
 
 
