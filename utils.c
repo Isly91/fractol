@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/25 16:05:30 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/25 16:09:57 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/30 18:27:34 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@ double	change_imaginary_image_x(t_imagine *img, uint32_t x_coordinate)
 	double	interval;
 	double	coordinate;
 
+	interval = img->z_max_x / img->image->width;
 	img->movex = img->zoom;
-	interval = img->zoom * img->z_max_x / img->image->width;
-	coordinate = interval * (double)x_coordinate - img->movex;
+	coordinate = img->zoom * interval * (double)x_coordinate - img->movex;
 	return (coordinate);
 }
 
@@ -33,8 +33,8 @@ double	change_imaginary_image_y(t_imagine *img, uint32_t y_coordinate)
 	double	interval;
 	double	coordinate;
 
-	img->movey = img->movex * 3 / 4;
-	interval = img->zoom * img->z_max_y / img->image->height;
-	coordinate = interval * (double)y_coordinate - img->movey;
+	interval = img->z_max_y / img->image->height;
+	img->movey = img->zoom;
+	coordinate = img->zoom * interval * (double)y_coordinate - img->movey;
 	return (coordinate);
 }

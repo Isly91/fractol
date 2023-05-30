@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/12 11:54:14 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/26 12:33:14 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/30 18:12:19 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,12 @@ int	julia_or_mandelbrot(char *which_fractal, t_imagine *img)
 {
 	if (ft_strncmp("Julia", which_fractal, 6) == 0)
 	{
-		img->z_max_x = 2;
-		img->z_max_y = 2;
-		img->zoom = .7;
+		img->zoom = 1;
 		return (1);
 	}
 	else if (ft_strncmp("Mandelbrot", which_fractal, 10) == 0)
 	{
-		img->z_max_x = 2;
-		img->z_max_y = 2;
-		img->zoom = 10;
+		img->zoom = 2;
 		return (0);
 	}
 	else
@@ -36,21 +32,30 @@ int	julia_or_mandelbrot(char *which_fractal, t_imagine *img)
 	}
 }
 
-void	add_parameters(t_imagine *img, char **argv, int argc, mlx_t *mlx)
+void	add_parameters(t_imagine *img, char **argv, int argc)
 {
-	if (argc < 2)
-		exit(EXIT_FAILURE);
-	else if (argc == 2)
+	if (argc == 2)
 	{
 		img->julia_or_mandelbrot = julia_or_mandelbrot(argv[1], img);
-		img->image->width = mlx->width;
-		img->image->height = mlx->height;
-		img->mlx = mlx;
+		if (img->julia_or_mandelbrot == 1)
+		{
+			img->input_julia.x = -0.8;
+			img->input_julia.y = 0.156;
+		}
+	}
+	else if (argc == 3)
+	{
+		img->julia_or_mandelbrot = julia_or_mandelbrot(argv[1], img);
+		if (img->julia_or_mandelbrot == 1 && ft_strlen(argv[2]) == 1)
+			julia_set(img, argv);
+		else
+			color_mandelbrot_choice(img, argv);
 	}
 	else
 	{
-		ft_printf("\nSorry I only accept 2 parameters due to close deadline\n\n");
-		ft_printf("\tPlease type './fractol Mandelbrot' or './fractol Julia'\n\n");
+		ft_printf("\nSorry, wrong info to run the program\n\n");
+		ft_printf("Please type or './fractol Julia <1> or <2> or <3> or \n");
+		ft_printf("Please type './fractol Mandelbrot <color>'\n");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -63,17 +68,10 @@ void	my_scrollhook(double xdelta, double ydelta, void *param)
 	(void)xdelta;
 	if (ydelta < 0)
 	{
-		mlx_get_mouse_pos(img->mlx, &img->mouseX, &img->mouseY);
-		printf("%d\t%d\n", img->mouseX, img->mouseY);
-		img->z_max_x =  img->z_max_x * img->mouseX / (img->mlx->width / 2) ;
-		img->z_max_y = img->z_max_y * img->mouseY / (img->mlx->height / 2) ;
 		img->zoom *= 1.1;
 	}
 	else
 	{
-		mlx_get_mouse_pos(img->mlx, &img->mouseX, &img->mouseY);
-		img->z_max_x =  img->z_max_x * img->mouseX / (img->mlx->width / 2) ;
-		img->z_max_y = img->z_max_y * img->mouseY / (img->mlx->height / 2) ;
 		img->zoom *= 0.9;
 	}
 	if (img->julia_or_mandelbrot == 0)
@@ -85,35 +83,12 @@ void	my_scrollhook(double xdelta, double ydelta, void *param)
 
 void	hook(struct mlx_key_data key_data, void *param)
 {
-	mlx_t	*mlx;
-
-	mlx = param;
-	if (key_data.key == MLX_KEY_ESCAPE && key_data.action == MLX_RELEASE)
-		mlx_close_window(mlx);
-}
-
-//mlx_get_mouse_pos(img->mlx, &img->mouseX, &img->mouseY);
-void my_mouse_hook(mouse_key_t button, action_t action, modifier_key_t mods, void *param)
-{
-	(void) button;
-	(void) action;
-	(void) mods;
 	t_imagine	*img;
-	
-	img = param;
-	if (MLX_PRESS == 1)
-	{
-		mlx_get_mouse_pos(img->mlx, &img->mouseX, &img->mouseY);
-		img->z_max_x *= 1.1;
-		img->z_max_y *= 1.1;
-	}
-	if (img->julia_or_mandelbrot == 0)
-		draw_mandelbrot(img);
-	else
-		julia(img);
-	//mlx_image_to_window(img->mlx, img->image, 0, 0);
-}
 
+	img = param;
+	if (key_data.key == MLX_KEY_ESCAPE && key_data.action == MLX_RELEASE)
+		mlx_close_window(img->mlx);
+}
 
 int32_t	main(int argc, char **argv)
 {
@@ -124,7 +99,8 @@ int32_t	main(int argc, char **argv)
 	if (!mlx)
 		exit(EXIT_FAILURE);
 	img.image = mlx_new_image(mlx, WIDTH, HEIGHT);
-	add_parameters(&img, argv, argc, mlx);
+	img.mlx = mlx;
+	add_parameters(&img, argv, argc);
 	ft_memset(img.image->pixels, 255, img.image->width
 		* img.image->height * sizeof(int32_t));
 	if (img.julia_or_mandelbrot == 0)
@@ -132,9 +108,8 @@ int32_t	main(int argc, char **argv)
 	else
 		julia(&img);
 	mlx_scroll_hook(mlx, &my_scrollhook, &img);
-	mlx_mouse_hook(mlx, &my_mouse_hook, &img);
 	mlx_image_to_window(mlx, img.image, 0, 0);
-	mlx_key_hook(mlx, &hook, mlx);
+	mlx_key_hook(mlx, &hook, &img);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
 	return (EXIT_SUCCESS);

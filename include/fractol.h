@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/25 10:33:56 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/26 12:31:16 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/30 18:05:04 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@ typedef struct color_s
 	int32_t		g;
 	int32_t		b;
 	int32_t		a;
+	int32_t		new_r;
+	int32_t		new_g;
+	int32_t		new_b;
 	double		brightness;
 }	t_color;
 
@@ -50,6 +53,7 @@ typedef struct s_imagine
 	double		x;
 	double		y;
 	t_complex	z;
+	t_complex	input_julia;
 	double		xtemp;
 	double		ytemp;
 	double		z_max_x;
@@ -58,6 +62,9 @@ typedef struct s_imagine
 	uint32_t	color;
 	int32_t		mouseX;
 	int32_t		mouseY;
+	double		centroXimmaginario;
+	double		centroYimmaginario;
+	t_color		color_set;
 }	t_imagine;
 
 void	change_colors(mlx_image_t *quella_troia);
@@ -67,5 +74,7 @@ int32_t	ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a);
 void	my_scrollhook(double xdelta, double ydelta, void *param);
 double	change_imaginary_image_x(t_imagine *immagine, uint32_t x_coordinate);
 double	change_imaginary_image_y(t_imagine *immagine, uint32_t y_coordinate);
+void	julia_set(t_imagine *img, char **argv);
+void color_mandelbrot_choice(t_imagine *img, char **argv);
 
 #endif

@@ -6,21 +6,34 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/15 19:54:01 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/25 16:20:35 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/30 17:32:31 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fractol.h"
 
+	//color.r = (int)(color.brightness * 100 / iter * 20);
+	//color.g = (int)(color.brightness);
+	//color.b = (int)(color.brightness * 100 / iter * 20);
+
 void	give_color_mandelbrot(t_imagine *img, int iter)
 {
 	t_color	color;
 
-	color.brightness = log2(1.75 + iter - log(log2(sqrt(img->zx * img->zx
-						+ img->zy * img->zy)))) / log2(100);
-	color.r = (int)(color.brightness * 100 / iter * 20);
-	color.g = (int)(color.brightness);
-	color.b = (int)(color.brightness * 10 / iter * 25);
+	color.brightness = log2(1.75 + iter - log2(log2(sqrt(img->zx * img->zx
+						+ img->zy * img->zy))));
+	if (!img->color_set.new_r || !img->color_set.new_g || !img->color_set.new_b)
+	{
+		color.r = (int)(color.brightness * 100 / iter * 20);
+		color.g = (int)(color.brightness);
+		color.b = (int)(color.brightness * 10 / iter * 25);
+	}
+	else
+	{
+		color.r = (int)(color.brightness * img->color_set.new_r / iter * 25);
+		color.g = (int)(color.brightness * img->color_set.new_g / iter * 25);
+		color.b = (int)(color.brightness * img->color_set.new_b / iter * 25);
+	}
 	color.a = 255;
 	img->color = ft_pixel(color.r, color.g, color.b, color.a);
 }
@@ -58,6 +71,10 @@ void	draw_mandelbrot(t_imagine *img)
 {
 	int	iter;
 
+	img->z_max_x = 2;
+	img->z_max_y = 2.5;
+	img->image->width = img->image->width;
+	img->image->height = img->image->height;
 	iter = 0;
 	img->y = 0;
 	mandelbrot(img, iter);

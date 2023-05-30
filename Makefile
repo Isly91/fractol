@@ -1,7 +1,8 @@
 SRC = main.c \
 	mandelbrot.c \
 	julia.c \
-	utils.c
+	utils.c \
+	inputs.c
 SRC_OBJ := obj_files
 CFLAGS = -Wall -Wextra -Werror -Ofast
 INCLUDE = -Iinclude -IMLX42/include/

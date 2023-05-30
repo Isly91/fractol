@@ -6,30 +6,31 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/17 14:34:21 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/25 18:01:02 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/30 18:26:44 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fractol.h"
 
-void draw_color_julia(t_imagine *img, int iter)
+void	draw_color_julia(t_imagine *img, int iter)
 {
-	img->color = 0xFFFFFF * sin(iter * 0.01);
+	img->color = 0xFFFFFF * sin(iter);
+	mlx_put_pixel(img->image, img->x, img->y, img->color);
 }
 
-void	draw_julia_set(t_imagine *img, t_complex c, int iter)
+void	draw_julia_set(t_imagine *img, t_complex c, int i)
 {
-	while (img->y < HEIGHT)
+	while (img->y < img->image->height)
 	{
 		img->x = 0;
-		while (img->x < WIDTH)
+		while (img->x < img->image->width)
 		{
 			img->cx = change_imaginary_image_x(img, img->x);
 			img->cy = change_imaginary_image_y(img, img->y);
-			iter = 0;
+			i = 0;
 			img->z.x = img->cx;
 			img->z.y = img->cy;
-			while (iter < 10000)
+			while (img->z.x * img->z.x + img->z.y * img->z.y <= 4.0 && i < 300)
 			{
 				img->xtemp = img->z.x * img->z.x - img->z.y * img->z.y + c.x;
 				img->ytemp = 2 * img->z.x * img->z.y + c.y;
@@ -37,10 +38,9 @@ void	draw_julia_set(t_imagine *img, t_complex c, int iter)
 				img->z.y = img->ytemp;
 				if (img->z.x * img->z.x + img->z.y * img->z.y > 4.0)
 					break ;
-				iter++;
+				i++;
 			}
-			draw_color_julia(img, iter);
-			mlx_put_pixel(img->image, img->x, img->y, img->color);
+			draw_color_julia(img, i);
 			img->x++;
 		}
 		img->y++;
@@ -50,11 +50,12 @@ void	draw_julia_set(t_imagine *img, t_complex c, int iter)
 void	julia(t_imagine *img)
 {
 	int			iter;
-	//t_complex	c = {-0.7, 0.27015};
-	t_complex	c = {-0.8, 0.156};
-	//t_complex	c = {0.355, 0.355};
 
 	iter = 0;
 	img->y = 0;
-	draw_julia_set(img, c, iter);
+	img->z_max_x = 2;
+	img->z_max_y = 2.5;
+	img->image->width = img->image->width;
+	img->image->height = img->image->height;
+	draw_julia_set(img, img->input_julia, iter);
 }
