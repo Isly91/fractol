@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/30 17:59:46 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/30 18:23:13 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/30 18:43:17 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,19 +39,19 @@ void	julia_set(t_imagine *img, char **argv)
 
 void	color_mandelbrot_choice(t_imagine *img, char **argv)
 {
-	if (ft_strncmp("GREEN", argv[2], 5) == 0)
+	if (ft_strncmp("GREEN", argv[2], 6) == 0)
 	{
 		img->color_set.new_r = 1;
 		img->color_set.new_g = 100;
 		img->color_set.new_b = 1;
 	}
-	else if (ft_strncmp("PURPLE", argv[2], 5) == 0)
+	else if (ft_strncmp("PURPLE", argv[2], 7) == 0)
 	{
 		img->color_set.new_r = 100;
 		img->color_set.new_g = 1;
 		img->color_set.new_b = 100;
 	}
-	else if (ft_strncmp("RED", argv[2], 3) == 0)
+	else if (ft_strncmp("RED", argv[2], 4) == 0)
 	{
 		img->color_set.new_r = 100;
 		img->color_set.new_g = 1;

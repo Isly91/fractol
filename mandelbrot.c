@@ -6,15 +6,11 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/15 19:54:01 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/30 17:32:31 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/30 19:44:29 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fractol.h"
-
-	//color.r = (int)(color.brightness * 100 / iter * 20);
-	//color.g = (int)(color.brightness);
-	//color.b = (int)(color.brightness * 100 / iter * 20);
 
 void	give_color_mandelbrot(t_imagine *img, int iter)
 {
@@ -52,7 +48,7 @@ void	mandelbrot(t_imagine *img, int iter)
 			img->cx = change_imaginary_image_x(img, img->x);
 			img->cy = change_imaginary_image_y(img, img->y);
 			iter = 0;
-			while (img->zx * img->zx + img->zy * img->zy < 4 && iter < 100)
+			while (img->zx * img->zx + img->zy * img->zy < 4 && iter < MAX_ITER)
 			{
 				xtemp = img->zx * img->zx - img->zy * img->zy + img->cx;
 				img->zy = 2 * img->zx * img->zy + img->cy;

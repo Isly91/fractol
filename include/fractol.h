@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/25 10:33:56 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/30 18:05:04 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/30 19:44:38 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # define WIDTH	2000
 # define HEIGHT	2000
 # define BPP
+# define MAX_ITER 100
 
 typedef struct color_s
 {
@@ -60,10 +61,6 @@ typedef struct s_imagine
 	double		z_max_y;
 	double		zoom;
 	uint32_t	color;
-	int32_t		mouseX;
-	int32_t		mouseY;
-	double		centroXimmaginario;
-	double		centroYimmaginario;
 	t_color		color_set;
 }	t_imagine;
 
@@ -75,6 +72,6 @@ void	my_scrollhook(double xdelta, double ydelta, void *param);
 double	change_imaginary_image_x(t_imagine *immagine, uint32_t x_coordinate);
 double	change_imaginary_image_y(t_imagine *immagine, uint32_t y_coordinate);
 void	julia_set(t_imagine *img, char **argv);
-void color_mandelbrot_choice(t_imagine *img, char **argv);
+void	color_mandelbrot_choice(t_imagine *img, char **argv);
 
 #endif

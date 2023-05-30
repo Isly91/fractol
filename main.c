@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/12 11:54:14 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/30 18:12:19 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/30 19:43:44 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void	my_scrollhook(double xdelta, double ydelta, void *param)
 	}
 	else
 	{
-		img->zoom *= 0.9;
+		img->zoom *= 1 / 1.1;
 	}
 	if (img->julia_or_mandelbrot == 0)
 		draw_mandelbrot(img);
@@ -99,6 +99,8 @@ int32_t	main(int argc, char **argv)
 	if (!mlx)
 		exit(EXIT_FAILURE);
 	img.image = mlx_new_image(mlx, WIDTH, HEIGHT);
+	if (!img.image)
+		exit(EXIT_FAILURE);
 	img.mlx = mlx;
 	add_parameters(&img, argv, argc);
 	ft_memset(img.image->pixels, 255, img.image->width
@@ -108,7 +110,8 @@ int32_t	main(int argc, char **argv)
 	else
 		julia(&img);
 	mlx_scroll_hook(mlx, &my_scrollhook, &img);
-	mlx_image_to_window(mlx, img.image, 0, 0);
+	if (mlx_image_to_window(mlx, img.image, 0, 0) < 0)
+		exit(EXIT_FAILURE);
 	mlx_key_hook(mlx, &hook, &img);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
