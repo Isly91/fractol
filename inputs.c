@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/30 17:59:46 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/30 18:43:17 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/31 08:41:27 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	julia_set(t_imagine *img, char **argv)
 	else
 	{
 		ft_printf("\nThird parameter is not accepted\n\n");
-		ft_printf("\tPlease type or './fractol Julia <1> or <2> or <3>'\n\n");
+		ft_printf("\tPlease type './fractol Julia <1> or <2> or <3>'\n\n");
 		exit(EXIT_FAILURE);
 	}	
 }

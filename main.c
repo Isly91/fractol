@@ -6,7 +6,7 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/12 11:54:14 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/30 19:43:44 by ibehluli      ########   odam.nl         */
+/*   Updated: 2023/05/31 08:42:25 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 
 int	julia_or_mandelbrot(char *which_fractal, t_imagine *img)
 {
-	if (ft_strncmp("Julia", which_fractal, 6) == 0)
+	if (ft_strncmp("Julia", which_fractal, 7) == 0)
 	{
 		img->zoom = 1;
 		return (1);
 	}
-	else if (ft_strncmp("Mandelbrot", which_fractal, 10) == 0)
+	else if (ft_strncmp("Mandelbrot", which_fractal, 11) == 0)
 	{
-		img->zoom = 2;
+		img->zoom = 4;
 		return (0);
 	}
 	else
@@ -53,7 +53,7 @@ void	add_parameters(t_imagine *img, char **argv, int argc)
 	}
 	else
 	{
-		ft_printf("\nSorry, wrong info to run the program\n\n");
+		ft_printf("\nSorry, wrong info to run the program.\n\n");
 		ft_printf("Please type or './fractol Julia <1> or <2> or <3> or \n");
 		ft_printf("Please type './fractol Mandelbrot <color>'\n");
 		exit(EXIT_FAILURE);
@@ -67,13 +67,9 @@ void	my_scrollhook(double xdelta, double ydelta, void *param)
 	img = param;
 	(void)xdelta;
 	if (ydelta < 0)
-	{
 		img->zoom *= 1.1;
-	}
 	else
-	{
 		img->zoom *= 1 / 1.1;
-	}
 	if (img->julia_or_mandelbrot == 0)
 		draw_mandelbrot(img);
 	else
@@ -103,8 +99,6 @@ int32_t	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	img.mlx = mlx;
 	add_parameters(&img, argv, argc);
-	ft_memset(img.image->pixels, 255, img.image->width
-		* img.image->height * sizeof(int32_t));
 	if (img.julia_or_mandelbrot == 0)
 		draw_mandelbrot(&img);
 	else
