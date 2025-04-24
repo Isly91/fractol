@@ -14,7 +14,7 @@
 # define FRACTOL_H
 
 # include "MLX42/MLX42.h"
-# include "../libft/headers/libft.h"
+# include "../libft/libft.h"
 # include <math.h>
 # define WIDTH	2000
 # define HEIGHT	2000

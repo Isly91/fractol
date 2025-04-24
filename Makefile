@@ -1,40 +1,67 @@
-SRC = main.c \
-	mandelbrot.c \
-	julia.c \
-	utils.c \
-	inputs.c
-SRC_OBJ := obj_files
-CFLAGS = -Wall -Wextra -Werror -Ofast
-INCLUDE = -Iinclude -IMLX42/include/
-MLX42 = MLX42
-MLX42AR = $(MLX42)/build/libmlx42.a
-LFLAGS = -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit
-LIBFT = libft
-HEADER = ./include/fractol.h
-LIBFTAR = $(LIBFT)/libft.a
-CC = gcc 
-EXEC_SRC = fractol
-RED = \x1b[31;01m
-GREEN = \x1b[32;01m
-BLUE = \033[34;1m
-BOLD = \033[1m
-RESET = \x1b[0m
-RM = /bin/rm -f
-all: $(LIBFTAR) $(MLX42AR) $(EXEC_SRC)
-$(LIBFTAR): 
+# -------------------- CONFIG --------------------
+NAME      = fractol
+CC        = gcc
+CFLAGS    = -Wall -Wextra -Werror -Ofast
+SRC       = main.c mandelbrot.c julia.c utils.c inputs.c
+OBJ_DIR   = obj_files
+INCLUDE   = -Iinclude -IMLX42/include/
+LIBFT     = libft
+LIBFT_AR  = $(LIBFT)/libft.a
+HEADER    = include/fractol.h
+
+MLX42     = MLX42
+MLX42_AR  = $(MLX42)/build/libmlx42.a
+
+SRC_OBJS  = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
+RM        = /bin/rm -f
+
+# -------------------- OS DETECTION --------------------
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Linux)
+	LFLAGS = -lglfw -ldl -lm
+else
+	LFLAGS = $(shell pkg-config --libs glfw3)
+	INCLUDE = -Iinclude -IMLX42/include/ $(shell pkg-config --cflags glfw3)
+endif
+
+# -------------------- COLORS --------------------
+RED    = \x1b[31;01m
+GREEN  = \x1b[32;01m
+BLUE   = \033[34;1m
+BOLD   = \033[1m
+RESET  = \x1b[0m
+
+# -------------------- RULES --------------------
+all: $(LIBFT_AR) $(MLX42_AR) $(NAME)
+
+$(OBJ_DIR)/%.o: %.c $(HEADER) | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
+
+$(LIBFT_AR):
 	@make -C $(LIBFT)
-$(MLX42AR):
-	@cmake $(MLX42) -B $(MLX42)/build
+
+$(MLX42_AR):
+	@cmake -S $(MLX42) -B $(MLX42)/build
 	@make -C $(MLX42)/build -j4
-$(EXEC_SRC): $(SRC) $(HEADER)
-	@$(CC) $(INCLUDE) $(CFLAGS) $(SRC) $(LFLAGS) $(LIBFTAR) $(MLX42AR) -o $(EXEC_SRC)
-	@printf "$(BOLD) $(BLUE) --- Executable named '$(EXEC_SRC)' ready ---$(RESET)\n"
+
+$(NAME): $(SRC_OBJS)
+	@$(CC) $(CFLAGS) $(INCLUDE) $(SRC) $(LIBFT_AR) $(MLX42_AR) $(LFLAGS) -o $(NAME)
+	@printf "$(BOLD)$(BLUE)--- Executable named '$(NAME)' ready ---$(RESET)\n"
+
 clean:
 	@make clean -C $(LIBFT)
-	@make clean -C $(MLX42)/build -j4
-	@rm -rf $(EXEC_SRC)
+	@make clean -C $(MLX42)/build
+	@$(RM) -r $(OBJ_DIR)
+	@$(RM) $(NAME)
+
 fclean: clean
 	@make fclean -C $(LIBFT)
-	@make clean/fast -C $(MLX42)/build -j4
+	@make clean -C $(MLX42)/build
+
 re: fclean all
+
 .PHONY: all clean fclean re
