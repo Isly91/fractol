@@ -24,7 +24,13 @@ Each set is rendered pixel by pixel using iteration logic on complex numbers.
 ---
 
 ## 🛠️ How to Run
-
+```bash
+./fractol Mandelbrot
+```
+or
+```bash
+./fractol Julia
+```
 ### Requirements
 
 - macOS or Linux
