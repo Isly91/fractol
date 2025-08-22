@@ -6,72 +6,80 @@
 /*   By: ibehluli <ibehluli@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/05/15 19:54:01 by ibehluli      #+#    #+#                 */
-/*   Updated: 2023/05/30 19:44:29 by ibehluli      ########   odam.nl         */
+/*   Updated: 2025/08/22 13:56:30 by ibehluli      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fractol.h"
 
-void	give_color_mandelbrot(t_imagine *img, int iter)
+void give_color_mandelbrot(t_imagine *img, int iter)
 {
-	t_color	color;
+    t_color color;
 
-	color.brightness = log2(1.75 + iter - log2(log2(sqrt(img->zx * img->zx
-						+ img->zy * img->zy))));
-	if (!img->color_set.new_r || !img->color_set.new_g || !img->color_set.new_b)
-	{
-		color.r = (int)(color.brightness * 100 / iter * 20);
-		color.g = (int)(color.brightness);
-		color.b = (int)(color.brightness * 10 / iter * 25);
-	}
-	else
-	{
-		color.r = (int)(color.brightness * img->color_set.new_r / iter * 25);
-		color.g = (int)(color.brightness * img->color_set.new_g / iter * 25);
-		color.b = (int)(color.brightness * img->color_set.new_b / iter * 25);
-	}
-	color.a = 255;
-	img->color = ft_pixel(color.r, color.g, color.b, color.a);
+    color.brightness = log2(1.75 + iter - log2(log2(sqrt(img->zx * img->zx + img->zy * img->zy))));
+    if (!img->color_set.new_r || !img->color_set.new_g || !img->color_set.new_b)
+    {
+        color.r = (int)(color.brightness * 100 / iter * 20);
+        color.g = (int)(color.brightness);
+        color.b = (int)(color.brightness * 10 / iter * 25);
+    }
+    else
+    {
+        color.r = (int)(color.brightness * img->color_set.new_r / iter * 25);
+        color.g = (int)(color.brightness * img->color_set.new_g / iter * 25);
+        color.b = (int)(color.brightness * img->color_set.new_b / iter * 25);
+    }
+    color.a = 255;
+    img->color = ft_pixel(color.r, color.g, color.b, color.a);
 }
 
-void	mandelbrot(t_imagine *img, int iter)
+void mandelbrot_pixel(t_imagine *img, int x, int y)
 {
-	double	xtemp;
+    double zx = 0.0;
+    double zy = 0.0;
+    double cx = change_imaginary_image_x(img, x);
+    double cy = change_imaginary_image_y(img, y);
+    double xtemp;
+    int iter = 0;
 
-	while ((uint32_t) img->y < img->image->height)
-	{
-		img->x = 0;
-		while ((uint32_t) img->x < img->image->width)
-		{
-			img->zx = 0.0;
-			img->zy = 0.0;
-			img->cx = change_imaginary_image_x(img, img->x);
-			img->cy = change_imaginary_image_y(img, img->y);
-			iter = 0;
-			while (img->zx * img->zx + img->zy * img->zy < 4 && iter < MAX_ITER)
-			{
-				xtemp = img->zx * img->zx - img->zy * img->zy + img->cx;
-				img->zy = 2 * img->zx * img->zy + img->cy;
-				img->zx = xtemp;
-				iter++;
-			}
-			give_color_mandelbrot(img, iter);
-			mlx_put_pixel(img->image, img->x, img->y, img->color);
-			img->x++;
-		}
-		img->y++;
-	}
+    while (zx * zx + zy * zy < 4 && iter < MAX_ITER)
+    {
+        xtemp = zx * zx - zy * zy + cx;
+        zy = 2 * zx * zy + cy;
+        zx = xtemp;
+        iter++;
+    }
+    img->zx = zx;
+    img->zy = zy;
+    give_color_mandelbrot(img, iter);
+    mlx_put_pixel(img->image, x, y, img->color);
 }
 
-void	draw_mandelbrot(t_imagine *img)
+void *mandelbrot_worker(void *arg)
 {
-	int	iter;
+    t_thread *data = (t_thread *)arg;
 
-	img->z_max_x = 2;
-	img->z_max_y = 2.5;
-	img->image->width = img->image->width;
-	img->image->height = img->image->height;
-	iter = 0;
-	img->y = 0;
-	mandelbrot(img, iter);
+    for (int y = data->start_y; y < data->end_y; y++)
+    {
+        for (int x = 0; x < WIDTH; x++)
+            mandelbrot_pixel(data->img, x, y);
+    }
+    return NULL;
+}
+
+void draw_mandelbrot_threaded(t_imagine *img)
+{
+    pthread_t threads[THREADS];
+    t_thread args[THREADS];
+    int slice = HEIGHT / THREADS;
+
+    for (int i = 0; i < THREADS; i++)
+    {
+        args[i].img = img;
+        args[i].start_y = i * slice;
+        args[i].end_y = (i + 1) * slice;
+        pthread_create(&threads[i], NULL, mandelbrot_worker, &args[i]);
+    }
+    for (int i = 0; i < THREADS; i++)
+        pthread_join(threads[i], NULL);
 }

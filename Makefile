@@ -1,7 +1,7 @@
 # -------------------- CONFIG --------------------
 NAME      = fractol
 CC        = gcc
-CFLAGS    = -Wall -Wextra -Werror -Ofast
+CFLAGS    = -Wall -Wextra -Werror -Ofast -pthread
 SRC       = main.c mandelbrot.c julia.c utils.c inputs.c
 OBJ_DIR   = obj_files
 INCLUDE   = -Iinclude -IMLX42/include/
